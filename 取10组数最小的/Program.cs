@@ -9,20 +9,17 @@ namespace 取10组数最小的
     {
         static void Main(string[] args)
         {
-            List<List<Lottery>> oldLotteryList = JsonConvert.DeserializeObject<List<List<Lottery>>>(File.ReadAllText("test.json"));
 
             //  List<List<Lottery>> lotteryList = new List<List<Lottery>>();
             //  Init(lotteryList);
-            for (int i = 0; i < 10; i++)
+            for (int i = 1; i <= 10; i++)
             {//一次比较，从1号到10位位，位置交替，从1到10，1走完放到最后，2开始走。。。
-                List<List<Lottery>> lotteryList = JsonConvert.DeserializeObject<List<List<Lottery>>>(File.ReadAllText("test.json"));
+                List<List<Lottery>> lotteryList = JsonConvert.DeserializeObject<List<List<Lottery>>>(File.ReadAllText("test"+i+".json"));
                 
 
                 DisplayAll("原数据", lotteryList);
                 Compare(lotteryList);
-                DisplayAll("排序和比较", lotteryList);
                 Repeat(lotteryList);
-                DisplayAll("位置去重复", lotteryList);
                 var result = DicToList(lotteryList);
                 Display("结果", result);
             }
