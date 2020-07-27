@@ -12,11 +12,26 @@ namespace 取10组数最小的
 
             //  List<List<Lottery>> lotteryList = new List<List<Lottery>>();
             //  Init(lotteryList);
-            for (int i = 1; i <= 10; i++)
-            {//一次比较，从1号到10位位，位置交替，从1到10，1走完放到最后，2开始走。。。
-                List<List<Lottery>> lotteryList = JsonConvert.DeserializeObject<List<List<Lottery>>>(File.ReadAllText("test"+i+".json"));
-                
 
+            //要生成的次数，最后取最优结果
+            for (int i = 0; i < 10; i++)
+            {
+                //一次比较，从1号到10位位，位置交替，从1到10，1走完放到最后，2开始走。。。
+                List<List<Lottery>> lotteryList = JsonConvert.DeserializeObject<List<List<Lottery>>>(File.ReadAllText("test1.json"));
+
+                //从新对N条数据进行排序，按从小到大，然后第二次第二大的在第一位，第一大的交替到最后
+
+                lotteryList[0] = lotteryList[0].OrderBy(o => o.Amount).ToList();
+                for (int j = 0; j < lotteryList.Count; j++)
+                {
+                    for (int k = 0; k < i; k++)//交替换位
+                    {
+                        var old = lotteryList[j][0];
+                        lotteryList[j].RemoveAt(0);
+                        lotteryList[j].Add(old);
+                    }
+
+                }
                 DisplayAll("原数据", lotteryList);
                 Compare(lotteryList);
                 Repeat(lotteryList);
@@ -137,7 +152,7 @@ namespace 取10组数最小的
         static void DisplayAll(string message, List<List<Lottery>> lotteries)
         {
             Console.WriteLine("----------------------{0}--------------------------------", message);
-            for (int j = 0; j < 10; j++)
+            for (int j = 0; j < lotteries.Count; j++)
             {
                 foreach (var res in lotteries[j])
                 {
