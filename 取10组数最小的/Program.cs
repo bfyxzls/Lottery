@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 namespace 取10组数最小的
 {
@@ -12,33 +11,39 @@ namespace 取10组数最小的
 
             //  List<List<Lottery>> lotteryList = new List<List<Lottery>>();
             //  Init(lotteryList);
+            Dictionary<decimal, List<Lottery>> dic = new Dictionary<decimal, List<Lottery>>();
+            List<List<Lottery>> lotteryList = new List<List<Lottery>>();
+            Init(lotteryList);
+            DisplayAll("原数据", lotteryList);
 
             //要生成的次数，最后取最优结果
             for (int i = 0; i < 10; i++)
             {
                 //一次比较，从1号到10位位，位置交替，从1到10，1走完放到最后，2开始走。。。
-                List<List<Lottery>> lotteryList = JsonConvert.DeserializeObject<List<List<Lottery>>>(File.ReadAllText("test1.json"));
-
+                // List<List<Lottery>> lotteryList = JsonConvert.DeserializeObject<List<List<Lottery>>>(File.ReadAllText("test1.json"));
+                //DisplayAll("原数据", lotteryList);
                 //从新对N条数据进行排序，按从小到大，然后第二次第二大的在第一位，第一大的交替到最后
+                lotteryList[i] = lotteryList[i].OrderBy(o => o.Amount).ToList();
 
-                lotteryList[0] = lotteryList[0].OrderBy(o => o.Amount).ToList();
                 for (int j = 0; j < lotteryList.Count; j++)
                 {
                     for (int k = 0; k < i; k++)//交替换位
                     {
-                        var old = lotteryList[j][0];
-                        lotteryList[j].RemoveAt(0);
-                        lotteryList[j].Add(old);
+                        var old = lotteryList[i][0];
+                        lotteryList[i].RemoveAt(0);
+                        lotteryList[i].Add(old);
                     }
+                    Compare(lotteryList);
+                    Repeat(lotteryList);
+                    var result = DicToList(lotteryList);
+                    if (!dic.ContainsKey(result.Sum(s => s.Amount)))
+                    {
+                        dic.Add(result.Sum(s => s.Amount), result);
 
+                    }
                 }
-                DisplayAll("原数据", lotteryList);
-                Compare(lotteryList);
-                Repeat(lotteryList);
-                var result = DicToList(lotteryList);
-                Display("结果", result);
             }
-
+            Display("最佳结果", dic[dic.Min(o => o.Key)]);
 
 
             Console.ReadKey();
@@ -60,7 +65,8 @@ namespace 取10组数最小的
                 for (int j = i + 1; j < lotteryList.Count; j++)
                 {
                     //最小值相同位置比较
-                    if (lotteryList[i][0].Number == lotteryList[j][0].Number && lotteryList[i][0].Amount > lotteryList[j][0].Amount) //位置相同，两个数字可能换位
+                    if (lotteryList[i][0].Number == lotteryList[j][0].Number
+                        && lotteryList[i][0].Amount > lotteryList[j][0].Amount) //位置相同，两个数字可能换位
                     {
                         if (lotteryList[i][1].Amount > lotteryList[j][1].Amount)
                         {
