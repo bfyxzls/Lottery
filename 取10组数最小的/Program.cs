@@ -13,39 +13,61 @@ namespace 取10组数最小的
             //List<List<Lottery>> lotteryList = new List<List<Lottery>>();
             //Init(lotteryList);
             //DisplayAll("原数据", lotteryList);
-
-            //要生成的行数 ，每行都走一次
+            int count = 0;
+            #region 要生成的行数 ，这与你的集合行数关
             for (int i = 0; i < 10; i++)
             {
                 //一次比较，从1号到10位位，位置交替，从1到10，1走完放到最后，2开始走。。。
                 List<List<Lottery>> lotteryList = JsonConvert.DeserializeObject<List<List<Lottery>>>(File.ReadAllText("test1.json"));
                 DisplayAll("原数据", lotteryList);
-                //从新对N条数据进行排序，按从小到大，然后第二次第二大的在第一位，第一大的交替到最后
-                lotteryList[i] = lotteryList[i].OrderBy(o => o.Amount).ToList();
-
-                //当前行交替之后与其它行进行计算
+                #region 先对集合排序
                 for (int j = 0; j < lotteryList.Count; j++)
                 {
-                    //当前行交替换位
+                    lotteryList[j] = lotteryList[j].OrderBy(o => o.Amount).ToList();
+                }
+                #endregion
+
+                #region 当前行交替之后与其它行进行计算
+                for (int j = 0; j < lotteryList.Count; j++)
+                {
+
+                    #region 当前行交替换位
                     for (int k = 0; k < j; k++)
                     {
                         var old = lotteryList[i][0];
                         lotteryList[i].RemoveAt(0);
                         lotteryList[i].Add(old);
                     }
-
-                    Compare(lotteryList);
-                    Repeat(lotteryList);
-                    var result = DicToList(lotteryList);
-
-                    if (!dic.ContainsKey(result.Sum(s => s.Amount)))
+                    #endregion
+                    #region 其它行交替
+                    for (int others1 = 0; others1 < lotteryList.Count; others1++)
                     {
-                        dic.Add(result.Sum(s => s.Amount), result);
+
+                        for (int others = 0; others < others1; others++)
+                        {
+                            var old = lotteryList[j][0];
+                            lotteryList[j].RemoveAt(0);
+                            lotteryList[j].Add(old);
+                        }
+
+                        #endregion
+                        Compare(lotteryList);
+                        Repeat(lotteryList);
+                        var result = DicToList(lotteryList);
+                        count++;
+                        if (!dic.ContainsKey(result.Sum(s => s.Amount)))
+                        {
+                            dic.Add(result.Sum(s => s.Amount), result);
+                        }
                     }
                 }
-            }
+                #endregion
 
-            Console.WriteLine("计算次数：{0}", dic.Count);
+            }
+            #endregion
+
+
+            Console.WriteLine("计算次数：{0},字典数：{1}", count, dic.Count);
             Display("最佳结果", dic[dic.Min(o => o.Key)]);
 
 
