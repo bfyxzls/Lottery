@@ -46,10 +46,13 @@ namespace 取10组数最小的
                     int repeatCount = 0;
                     Repeat(lotteryList, repeatCount);
                     var result = DicToList(lotteryList);
-                    count++;
-                    if (!dic.ContainsKey(result.Sum(s => s.Amount)))
+                    if (result != null)
                     {
-                        dic.Add(result.Sum(s => s.Amount), result);
+                        count++;
+                        if (!dic.ContainsKey(result.Sum(s => s.Amount)))
+                        {
+                            dic.Add(result.Sum(s => s.Amount), result);
+                        }
                     }
 
                 }
@@ -132,10 +135,15 @@ namespace 取10组数最小的
         static List<Lottery> DicToList(List<List<Lottery>> lotteryList)
         {
             List<Lottery> lotteries = new List<Lottery>();
+
             lotteryList.ForEach(o =>
             {
                 lotteries.Add(o[0]);
             });
+            if (lotteries.Select(i => i.Number).Distinct().Count() < lotteries.Count)
+            {
+                return null;
+            }
             return lotteries;
         }
 
