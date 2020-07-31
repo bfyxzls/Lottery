@@ -10,17 +10,17 @@ namespace 取10组数最小的
         static void Main(string[] args)
         {
             Dictionary<decimal, List<Lottery>> dic = new Dictionary<decimal, List<Lottery>>();
-          
-  
-           
+
+
+
             int count = 0;
             #region 要生成的行数 ，这与你的集合行数关
             for (int i = 0; i < 10; i++)
             {
                 //一次比较，从1号到10位位，位置交替，从1到10，1走完放到最后，2开始走。。。
-                //List<List<Lottery>> lotteryList = JsonConvert.DeserializeObject<List<List<Lottery>>>(File.ReadAllText("test1.json"));
-                List<List<Lottery>> lotteryList = new List<List<Lottery>>();
-                Init(lotteryList);
+                List<List<Lottery>> lotteryList = JsonConvert.DeserializeObject<List<List<Lottery>>>(File.ReadAllText("test1.json"));
+                // List<List<Lottery>> lotteryList = new List<List<Lottery>>();
+                // Init(lotteryList);
                 DisplayAll("原数据", lotteryList);
                 #region 先对集合排序
                 for (int j = 0; j < lotteryList.Count; j++)
@@ -43,7 +43,8 @@ namespace 取10组数最小的
                     #endregion
 
                     Compare(lotteryList);
-                    Repeat(lotteryList);
+                    int repeatCount = 0;
+                    Repeat(lotteryList, repeatCount);
                     var result = DicToList(lotteryList);
                     count++;
                     if (!dic.ContainsKey(result.Sum(s => s.Amount)))
@@ -59,6 +60,10 @@ namespace 取10组数最小的
 
 
             Console.WriteLine("计算次数：{0},字典数：{1}", count, dic.Count);
+            foreach(var item in dic)
+            {
+                Display("输出", item.Value);
+            }
             Display("最佳结果", dic[dic.Min(o => o.Key)]);
 
 
@@ -71,27 +76,30 @@ namespace 取10组数最小的
         static void Compare(List<List<Lottery>> lotteryList)
         {
 
-            for (int i = 0; i < lotteryList.Count - 1; i++)
+            for (int i = 0; i < lotteryList.Count-1; i++)
             {
 
-                for (int j = i + 1; j < lotteryList.Count; j++)
+                for (int j = 1; j < lotteryList.Count; j++)
                 {
                     //最小值相同位置比较
-                    if (lotteryList[i][0].Number == lotteryList[j][0].Number && lotteryList[i][0].Amount > lotteryList[j][0].Amount) //位置相同，两个数字可能换位
+                    if (lotteryList[i][0].Number == lotteryList[j][0].Number
+                        && lotteryList[i][0].Amount > lotteryList[j][0].Amount) //位置相同，两个数字可能换位
                     {
                         if (lotteryList[i][1].Amount > lotteryList[j][1].Amount)
                         {
                             var lottery = lotteryList[i][0];
                             lotteryList[i][0] = lotteryList[i][1];
                             lotteryList[i][1] = lottery;
-
+                            //   lotteryList[i].RemoveAt(0);//移除，因为位置不能重复
+                            //    lotteryList[i].Add(lotteryList[i][0]);
                         }
                         else
                         {
                             var lottery = lotteryList[j][0];
                             lotteryList[j][0] = lotteryList[j][1];
                             lotteryList[j][1] = lottery;
-
+                            //lotteryList[j].RemoveAt(0);
+                            //lotteryList[j].Add(lotteryList[j][0]);
                         }
 
                     }
@@ -105,7 +113,7 @@ namespace 取10组数最小的
         /// 位置去重复
         /// </summary>
         /// <param name="lotteryList"></param>
-        static void Repeat(List<List<Lottery>> lotteryList)
+        static void Repeat(List<List<Lottery>> lotteryList, int repeatCount)
         {
 
             bool repeat = false;
@@ -124,7 +132,7 @@ namespace 取10组数最小的
                         if (lotteryList[i][0].Amount > lotteryList[j][0].Amount)//第二小的元素也比第二行的大，这时取第二行的数字
                         {
                             lotteryList[i].RemoveAt(0);//移除，因为位置不能重复
-                            lotteryList[i].Add(lotteryList[j][0]);
+                            lotteryList[i].Add(lotteryList[i][0]);
 
                         }
                         else
@@ -140,7 +148,10 @@ namespace 取10组数最小的
             }
             if (repeat)
             {
-                Repeat(lotteryList);
+                repeatCount++;
+
+                if (repeatCount < 1000)
+                    Repeat(lotteryList, repeatCount);
             }
 
         }
