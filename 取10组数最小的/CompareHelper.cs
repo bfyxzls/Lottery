@@ -5,13 +5,9 @@ using System.IO;
 using System.Linq;
 namespace 取10组数最小的
 {
-    class Program
+    class CompareHelper
     {
-        static void Main(string[] args)
-        {
-            CompareHelper.Run();
-        }
-        static void Run()
+        public static void Run()
         {
             Dictionary<decimal, List<Lottery>> dic = new Dictionary<decimal, List<Lottery>>();
 
@@ -42,9 +38,8 @@ namespace 取10组数最小的
                     {
                         var old = lotteryList[i][0];
                         lotteryList[i].RemoveAt(0);
-                        lotteryList[i].Add(old);                     
+                        lotteryList[i].Add(old);
                     }
-               
                     #endregion
 
                     Compare(lotteryList);
@@ -86,22 +81,10 @@ namespace 取10组数最小的
                     if (lotteryList[i][0].Number == lotteryList[j][0].Number
                         && lotteryList[i][0].Amount > lotteryList[j][0].Amount) //位置相同，两个数字可能换位
                     {
-                        if (lotteryList[i][1].Amount > lotteryList[j][1].Amount)
-                        {
-                            var lottery = lotteryList[i][0];
-                            lotteryList[i][0] = lotteryList[i][1];
-                            lotteryList[i][1] = lottery;
-                            //   lotteryList[i].RemoveAt(0);//移除，因为位置不能重复
-                            //    lotteryList[i].Add(lotteryList[i][0]);
-                        }
-                        else
-                        {
-                            var lottery = lotteryList[j][0];
-                            lotteryList[j][0] = lotteryList[j][1];
-                            lotteryList[j][1] = lottery;
-                            //lotteryList[j].RemoveAt(0);
-                            //lotteryList[j].Add(lotteryList[j][0]);
-                        }
+
+                        var lottery = lotteryList[j][0];
+                        lotteryList[j].RemoveAt(0);
+                        lotteryList[j].Add(lottery);
 
                     }
 
@@ -127,22 +110,12 @@ namespace 取10组数最小的
                         continue;
                     }
                     //最小值相同位置比较
-                    if (lotteryList[i][0].Number == lotteryList[j][0].Number) //位置相同，两个数字可能换位
+                    if (lotteryList[i][0].Number == lotteryList[j][0].Number && lotteryList[i][0].Amount > lotteryList[j][0].Amount) //位置相同，两个数字可能换位
                     {
                         repeat = true;
-                        if (lotteryList[i][0].Amount > lotteryList[j][0].Amount)//第二小的元素也比第二行的大，这时取第二行的数字
-                        {
-                            lotteryList[i].RemoveAt(0);//移除，因为位置不能重复
-                            lotteryList[i].Add(lotteryList[i][0]);
-
-                        }
-                        else
-                        {
-                            lotteryList[j].RemoveAt(0);
-                            lotteryList[j].Add(lotteryList[j][0]);
-
-
-                        }
+                        var lottery = lotteryList[j][0];
+                        lotteryList[j].RemoveAt(0);
+                        lotteryList[j].Add(lottery);
                     }
 
                 }
@@ -151,8 +124,7 @@ namespace 取10组数最小的
             {
                 repeatCount++;
 
-                if (repeatCount < 1000)
-                    Repeat(lotteryList, repeatCount);
+                Repeat(lotteryList, repeatCount);
             }
 
         }
