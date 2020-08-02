@@ -40,19 +40,17 @@ namespace 取10组数最小的
                         lotteryList[i].RemoveAt(0);
                         lotteryList[i].Add(old);
                     }
+
                     #endregion
 
                     Compare(lotteryList);
                     int repeatCount = 0;
                     Repeat(lotteryList, repeatCount);
                     var result = DicToList(lotteryList);
-                    if (result != null)
+                    count++;
+                    if (result!=null && !dic.ContainsKey(result.Sum(s => s.Amount)))
                     {
-                        count++;
-                        if (!dic.ContainsKey(result.Sum(s => s.Amount)))
-                        {
-                            dic.Add(result.Sum(s => s.Amount), result);
-                        }
+                        dic.Add(result.Sum(s => s.Amount), result);
                     }
 
                 }
@@ -78,7 +76,7 @@ namespace 取10组数最小的
             for (int i = 0; i < lotteryList.Count - 1; i++)
             {
 
-                for (int j = 1; j < lotteryList.Count; j++)
+                for (int j = i + 1; j < lotteryList.Count; j++)
                 {
                     //最小值相同位置比较
                     if (lotteryList[i][0].Number == lotteryList[j][0].Number
@@ -87,9 +85,16 @@ namespace 取10组数最小的
 
                         var lottery = lotteryList[j][0];
                         lotteryList[j].RemoveAt(0);
-                        lotteryList[j].Add(lottery);
+                        lotteryList[j].Insert(1,lottery);
 
                     }
+                    else
+                    {
+                        var lottery = lotteryList[i][0];
+                        lotteryList[i].RemoveAt(0);
+                        lotteryList[i].Insert(1,lottery);
+                    }
+
 
                 }
             }
@@ -113,13 +118,15 @@ namespace 取10组数最小的
                         continue;
                     }
                     //最小值相同位置比较
-                    if (lotteryList[i][0].Number == lotteryList[j][0].Number && lotteryList[i][0].Amount > lotteryList[j][0].Amount) //位置相同，两个数字可能换位
+                    if (lotteryList[i][0].Number == lotteryList[j][0].Number
+                        && lotteryList[i][0].Amount > lotteryList[j][0].Amount) //位置相同，两个数字可能换位
                     {
                         repeat = true;
                         var lottery = lotteryList[j][0];
                         lotteryList[j].RemoveAt(0);
                         lotteryList[j].Add(lottery);
                     }
+
 
                 }
             }
