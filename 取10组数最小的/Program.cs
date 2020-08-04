@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+
 namespace 取10组数最小的
 {
     class Program
@@ -14,9 +16,6 @@ namespace 取10组数最小的
         static void Run()
         {
             Dictionary<decimal, List<Lottery>> dic = new Dictionary<decimal, List<Lottery>>();
-
-
-
             int count = 0;
             #region 要生成的行数 ，这与你的集合行数关
             for (int i = 0; i < 10; i++)
@@ -74,7 +73,7 @@ namespace 取10组数最小的
         ///  做比较
         /// </summary>
         /// <param name="lotteryList"></param>
-        static void Compare(List<List<Lottery>> lotteryList)
+        async static Task Compare(List<List<Lottery>> lotteryList)
         {
 
             for (int i = 0; i < lotteryList.Count - 1; i++)
@@ -89,14 +88,18 @@ namespace 取10组数最小的
                         if (lotteryList[i][1].Amount > lotteryList[j][1].Amount)
                         {
                             var lottery = lotteryList[i][0];
-                            lotteryList[i][0] = lotteryList[i][1];
-                            lotteryList[i][1] = lottery;
+                            //lotteryList[i][0] = lotteryList[i][1];
+                            //lotteryList[i][1] = lottery;
+                            lotteryList[i].RemoveAt(0);
+                            lotteryList[i].Add(lottery);
                         }
                         else
                         {
                             var lottery = lotteryList[j][0];
-                            lotteryList[j][0] = lotteryList[j][1];
-                            lotteryList[j][1] = lottery;
+                            //lotteryList[j][0] = lotteryList[j][1];
+                            //lotteryList[j][1] = lottery;
+                            lotteryList[j].RemoveAt(0);
+                            lotteryList[j].Add(lottery);
                         }
 
                     }
@@ -110,7 +113,7 @@ namespace 取10组数最小的
         /// 位置去重复
         /// </summary>
         /// <param name="lotteryList"></param>
-        static void Repeat(List<List<Lottery>> lotteryList, int repeatCount)
+        async static Task Repeat(List<List<Lottery>> lotteryList, int repeatCount)
         {
 
             bool repeat = false;
