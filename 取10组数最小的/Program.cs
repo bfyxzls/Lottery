@@ -12,7 +12,9 @@ namespace 取10组数最小的
         static void Main(string[] args)
         {
             Dictionary<decimal, List<Lottery>> dic = new Dictionary<decimal, List<Lottery>>();
-            List<List<Lottery>> lotteryList = JsonConvert.DeserializeObject<List<List<Lottery>>>(File.ReadAllText("test1.json"));
+            //   List<List<Lottery>> lotteryList = JsonConvert.DeserializeObject<List<List<Lottery>>>(File.ReadAllText("test1.json"));
+            List<List<Lottery>> lotteryList = new List<List<Lottery>>();
+            Init(lotteryList);
             DisplayAll("原数据", lotteryList);
             int compareCount = 0;
 
