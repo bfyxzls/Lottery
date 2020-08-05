@@ -11,59 +11,71 @@ namespace 取10组数最小的
     {
         static void Main(string[] args)
         {
-            Run();
-        }
-        static void Run()
-        {
             Dictionary<decimal, List<Lottery>> dic = new Dictionary<decimal, List<Lottery>>();
+            List<List<Lottery>> lotteryList = JsonConvert.DeserializeObject<List<List<Lottery>>>(File.ReadAllText("test1.json"));
+            DisplayAll("原数据", lotteryList);
+            int compareCount = 0;
+
+            Run(dic, lotteryList, compareCount);
+        }
+        static void Run(Dictionary<decimal, List<Lottery>> dic, List<List<Lottery>> lotteryList, int compareCount)
+        {
+
             int count = 0;
+
             #region 要生成的行数 ，这与你的集合行数关
-            for (int i = 0; i < 10; i++)
+
+            //一次比较，从1号到10位位，位置交替，从1到10，1走完放到最后，2开始走。。。
+            // List<List<Lottery>> lotteryList = new List<List<Lottery>>();
+            // Init(lotteryList);
+            #region 先对集合排序
+            for (int j = 0; j < lotteryList.Count; j++)
             {
-                //一次比较，从1号到10位位，位置交替，从1到10，1走完放到最后，2开始走。。。
-                List<List<Lottery>> lotteryList = JsonConvert.DeserializeObject<List<List<Lottery>>>(File.ReadAllText("test1.json"));
-                // List<List<Lottery>> lotteryList = new List<List<Lottery>>();
-                // Init(lotteryList);
-                DisplayAll("原数据", lotteryList);
-                #region 先对集合排序
-                for (int j = 0; j < lotteryList.Count; j++)
+                lotteryList[j] = lotteryList[j].OrderBy(o => o.Amount).ToList();
+            }
+         
+
+            #endregion
+
+            #region 当前行交替之后与其它行进行计算
+            for (int j = 0; j < lotteryList.Count; j++)
+            {
+
+                #region 当前行交替换位
+                for (int k = 0; k < j; k++)
                 {
-                    lotteryList[j] = lotteryList[j].OrderBy(o => o.Amount).ToList();
+                    int index = compareCount % 9;
+                    var old = lotteryList[index][0];
+                    lotteryList[index].RemoveAt(0);
+                    lotteryList[index].Add(old);
                 }
+
                 #endregion
-
-                #region 当前行交替之后与其它行进行计算
-                for (int j = 0; j < lotteryList.Count; j++)
+                Compare(lotteryList);
+                int repeatCount = 0;
+                Repeat(lotteryList, repeatCount);
+                var result = DicToList(lotteryList);
+                count++;
+                if (result != null)
                 {
-
-                    #region 当前行交替换位
-                    for (int k = 0; k < j; k++)
-                    {
-                        var old = lotteryList[i][0];
-                        lotteryList[i].RemoveAt(0);
-                        lotteryList[i].Add(old);
-                    }
-
-                    #endregion
-
-                    Compare(lotteryList);
-                    int repeatCount = 0;
-                    Repeat(lotteryList, repeatCount);
-                    var result = DicToList(lotteryList);
-                    count++;
                     if (!dic.ContainsKey(result.Sum(s => s.Amount)))
                     {
                         dic.Add(result.Sum(s => s.Amount), result);
                     }
-
                 }
-                #endregion
-
             }
             #endregion
 
 
-            Console.WriteLine("计算次数：{0},字典数：{1}", count, dic.Count);
+            #endregion
+
+            compareCount++;
+            if (compareCount < 10)
+            {
+                Run(dic, lotteryList, compareCount);
+            }
+        
+            Console.WriteLine("字典数：{0}", dic.Count);
             Display("最佳结果", dic[dic.Min(o => o.Key)]);
 
 
@@ -85,27 +97,22 @@ namespace 取10组数最小的
                     if (lotteryList[i][0].Number == lotteryList[j][0].Number
                         && lotteryList[i][0].Amount > lotteryList[j][0].Amount) //位置相同，两个数字可能换位
                     {
-                        if (lotteryList[i][1].Amount > lotteryList[j][1].Amount)
-                        {
-                            var lottery = lotteryList[i][0];
-                            //lotteryList[i][0] = lotteryList[i][1];
-                            //lotteryList[i][1] = lottery;
-                            lotteryList[i].RemoveAt(0);
-                            lotteryList[i].Add(lottery);
-                        }
-                        else
-                        {
-                            var lottery = lotteryList[j][0];
-                            //lotteryList[j][0] = lotteryList[j][1];
-                            //lotteryList[j][1] = lottery;
-                            lotteryList[j].RemoveAt(0);
-                            lotteryList[j].Add(lottery);
-                        }
 
+                        var lottery = lotteryList[i][0];
+                        lotteryList[i].RemoveAt(0);
+                        lotteryList[i].Insert(1, lottery);
                     }
+                    else
+                    {
+                        var lottery = lotteryList[j][0];
+                        lotteryList[j].RemoveAt(0);
+                        lotteryList[j].Insert(1, lottery);
+                    }
+
 
                 }
             }
+
 
         }
 
@@ -141,8 +148,6 @@ namespace 取10组数最小的
                             var old = lotteryList[j][0];
                             lotteryList[j].RemoveAt(0);
                             lotteryList[j].Add(old);
-
-
                         }
                     }
 
@@ -163,6 +168,10 @@ namespace 取10组数最小的
             {
                 lotteries.Add(o[0]);
             });
+            if (lotteries.Select(i => i.Number).Distinct().Count() < lotteries.Count)
+            {
+                return null;
+            }
             return lotteries;
         }
 
