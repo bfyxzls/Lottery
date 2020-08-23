@@ -12,9 +12,8 @@ namespace 取10组数最小的
         static void Main(string[] args)
         {
             Dictionary<decimal, List<Lottery>> dic = new Dictionary<decimal, List<Lottery>>();
-             List<List<Lottery>> lotteryList = JsonConvert.DeserializeObject<List<List<Lottery>>>(File.ReadAllText("test1.json"));
-            //List<List<Lottery>> lotteryList = new List<List<Lottery>>();
-            //Init(lotteryList);
+            List<List<Lottery>> lotteryList = new List<List<Lottery>>();
+            Init(lotteryList);
             DisplayAll("原数据", lotteryList);
             int compareCount = 0;
 
@@ -26,10 +25,6 @@ namespace 取10组数最小的
             int count = 0;
 
             #region 要生成的行数 ，这与你的集合行数关
-
-            //一次比较，从1号到10位位，位置交替，从1到10，1走完放到最后，2开始走。。。
-            // List<List<Lottery>> lotteryList = new List<List<Lottery>>();
-            // Init(lotteryList);
             #region 先对集合排序
             for (int j = 0; j < lotteryList.Count; j++)
             {
